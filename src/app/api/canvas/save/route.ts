@@ -1,5 +1,5 @@
 import { prisma } from "@/app/services/db";
-import { authenticateUser } from "@/app/services/server/utils";
+// import { authenticateUser } from "@/app/services/server/utils";
 import { handleServerError } from "@/app/services/utils";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -14,7 +14,8 @@ interface UserObject {
 
 export async function POST(req: NextRequest) {
   try {
-    const user = await authenticateUser(req) as UserObject;
+    // const user = await authenticateUser(req) as UserObject;
+    const user : any = {};
     const { name, dataUrl } = await req.json();
     if (!name || !dataUrl) {
       return NextResponse.json({
