@@ -3,6 +3,7 @@ import { randomInt } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/services/db";
 import { handleServerError } from "@/app/services/utils";
+import { sendOtp } from "@/app/services/server/utils";
 
 export async function POST(req: Request) {
   try {
@@ -21,8 +22,7 @@ export async function POST(req: Request) {
   
     const otp = randomInt(100000, 999999).toString();
   
-    // TODO Send OTP to email
-    console.log(otp);
+    const otpSent = await sendOtp(email, otp);
 
     let otpObject = await prisma.otp.findUnique({
       where: {

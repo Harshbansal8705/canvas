@@ -2,7 +2,15 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "../db";
-import { toast } from "react-toastify";
+import nodemailer from "nodemailer";
+
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: process.env.NODEMAILER_USERNAME,
+    pass: process.env.NODEMAILER_PASSWORD
+  }
+});
 
 export async function authenticateUser(req: NextRequest) {
   const userHeader = req.headers.get("x-user");
@@ -40,4 +48,21 @@ export async function authenticateUser(req: NextRequest) {
     }, { status: 404 })
   }
   return foundUser;
+}
+
+export async function sendOtp(to: string, otp: string) {
+  const mailOptions = {
+    from: `Canvas <${process.env.NODEMAILER_USERNAME}>`,
+    to,
+    subject: 'OTP for Login to Canvas',
+    text: `Your OTP for login to Canvas is ${otp}. This OTP is valid for 5 minutes.`
+  };
+  
+  transporter.sendMail(mailOptions, function (error, info) {
+    if (error) {
+      console.log(error);
+    } else {
+      console.log('Email sent: ' + info.response);
+    }
+  });
 }
