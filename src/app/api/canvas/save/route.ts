@@ -2,7 +2,6 @@ import { prisma } from "@/app/services/db";
 import { authenticateUser } from "@/app/services/server/utils";
 import { handleServerError } from "@/app/services/utils";
 import { NextRequest, NextResponse } from "next/server";
-import { create } from "zustand";
 
 interface UserObject {
   id: string;
