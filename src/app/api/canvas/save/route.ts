@@ -8,7 +8,7 @@ interface UserObject {
   id: string;
   email: string;
   name?: string | null;
-  canvases: string[];
+  canvases: any[];
   createdAt: Date;
   updatedAt: Date;
 }
