@@ -11,4 +11,6 @@ export const useAuth = create((set) => ({
   setCanvasTitle: (title: string) => set({ canvasTitle: title }),
   roomName: "",
   setRoomName: (roomName: string) => set({ roomName }),
+  canvasDataUrl: "",
+  setCanvasDataUrl: (dataUrl: string) => set({ canvasDataUrl: dataUrl })
 }))

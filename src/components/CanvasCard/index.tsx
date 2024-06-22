@@ -5,13 +5,13 @@ import localFont from "next/font/local";
 
 const myFont = localFont({ src: "../../assets/fonts/post-no-bills/postnobillscolombo-extrabold.ttf" });
 
-export default function CanvasCard({ width = 36, height = 36, className }: { width?: number, height?: number, className?: string }) {
+export default function CanvasCard({ canvas, width = 36, height = 36, className }: { canvas: any, width?: number, height?: number, className?: string }) {
   return (
     <div className={`${height ? `h-[${height}]` : "h-36"} ${width ? `w-[${width}]` : "w-36"} relative ${className || ""}`}>
       <div className="w-full h-full bg-black opacity-[0.56] absolute"></div>
       <div className="w-full h-full -rotate-[8deg] bg-[#D9D9D9] p-3 flex justify-between flex-col">
-        <Image src={CanvasThumbnail} alt="Thumbnail" className="" />
-        <p className={`${myFont.className} text-black text-lg lg:text-xl my-2`}>Canvas 1</p>
+        <Image src={canvas?.dataUrl} alt="Thumbnail" className="w-full bg-white" width={100} height={50} />
+        <p className={`${myFont.className} text-black text-lg lg:text-xl my-2`}>{canvas?.name || ""}</p>
       </div>
     </div>
   );

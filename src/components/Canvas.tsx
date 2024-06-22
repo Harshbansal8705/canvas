@@ -13,7 +13,7 @@ export default function Canvas({ width, height, className }: { width: number, he
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState("#000000");
   const [isconnected, setIsConnected] = useState(false);
-  const [admin, roomId, setCanvasTitle] = useAuth((s: any) => [s.admin, s.roomId, s.setCanvasTitle]);
+  const [admin, roomId, setCanvasDataUrl] = useAuth((s: any) => [s.admin, s.roomId, s.setCanvasDataUrl]);
   let ctx = canvasRef.current?.getContext('2d');
 
   const getX = (x: number) => {
@@ -113,6 +113,7 @@ export default function Canvas({ width, height, className }: { width: number, he
 
     function mouseUpFunc(e: MouseEvent) {
       mouseDown = false;
+      if (canvasRef.current) setCanvasDataUrl(canvasRef.current.toDataURL("image/png"));
       // send();
     }
 

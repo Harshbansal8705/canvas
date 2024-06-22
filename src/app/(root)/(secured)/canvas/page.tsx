@@ -82,7 +82,10 @@ export default function CanvasPage() {
         </div>
         <div className="flex h-16 items-end w-44 gap-2">
           {/* <img src="/chat.svg" alt="user" className="p-2 h-9 hover:bg-[#CECAFF32] bg-[#CECAFF42] inline-block rounded-md" /> */}
-          <button className="bg-red-600 hover:bg-red-700 p-1 text-lg mt-4 font-semibold w-full">Leave</button>
+          <button className="bg-red-600 hover:bg-red-700 p-1 text-lg mt-4 font-semibold w-full" onClick={() => {
+            socket.disconnect();
+            router.push("/");
+          }}>Leave</button>
         </div>
       </div>
     </div>
