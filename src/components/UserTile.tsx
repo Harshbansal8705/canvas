@@ -4,7 +4,7 @@ export default function UserTile({ name }: { name: string }) {
       <div className="w-16 h-16 bg-[#4617A938] p-3 rounded-full">
         <img src="/user.svg" alt="user" className="w-full h-full" />
       </div>
-      <h3>{name}</h3>
+      <h3 className="w-[70%] overflow-x-hidden overflow-ellipsis">{name}</h3>
     </div>
   );
 }

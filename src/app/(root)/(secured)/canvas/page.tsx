@@ -78,7 +78,7 @@ export default function CanvasPage() {
       </div>
       <div className="mx-auto flex flex-col items-center w-56 justify-between">
         <div className="relative overflow-y-scroll">
-          {users && users.map((user, id) => <UserTile key={id} name={user.email} />)}
+          {users && users.map((user, id) => <UserTile key={id} name={user.name || user.email?.split("@")[0]} />)}
         </div>
         <div className="flex h-16 items-end w-44 gap-2">
           {/* <img src="/chat.svg" alt="user" className="p-2 h-9 hover:bg-[#CECAFF32] bg-[#CECAFF42] inline-block rounded-md" /> */}
