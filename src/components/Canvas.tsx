@@ -204,6 +204,7 @@ export default function Canvas({ width, height, className }: { width: number, he
     if (!canvasRef.current) return;
     if (!save) return;
     setSaving(false);
+    setSave(false);
     (async () => {
       setSaving(true);
       const response = await ifetch("/api/canvas/save", {
