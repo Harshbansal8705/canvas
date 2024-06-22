@@ -9,6 +9,7 @@ export default function Login() {
   const [otpDisabled, setOtpDisabled] = useState(true);
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
 
   const sendOTP = async () => {
@@ -18,6 +19,7 @@ export default function Login() {
     if (!validator.isEmail(email)) {
       return toast.error("Invalid email");
     }
+    setLoading(true);
     const { success, message } = await ifetch("/api/login/otp", {
       method: "POST",
       headers: {
@@ -28,12 +30,14 @@ export default function Login() {
     if (success) {
       setOtpDisabled(false);
     }
+    setLoading(false);
   }
 
   const verifyOTP = async () => {
     if (!otp) {
       return toast.error("OTP is required");
     }
+    setLoading(true);
     const response = await ifetch("/api/login/verify", {
       method: "POST",
       headers: {
@@ -41,6 +45,7 @@ export default function Login() {
       },
       body: JSON.stringify({ email, otp }),
     });
+    setLoading(false);
     if (response.success) {
       localStorage.setItem("token", response.data.token);
       localStorage.setItem("user", JSON.stringify(response.data.user));
@@ -61,7 +66,7 @@ export default function Login() {
             <input type="number" placeholder={"Enter OTP"} className={`bg-transparent text-white placeholder:text-gray-100 focus-visible:outline-none`} disabled={otpDisabled} value={otp} onChange={e => setOtp(e.target.value)} />
           </div>
         </div>
-        <button className="bg-[#F472B6] text-white font-bold w-full p-2 rounded-lg mt-5" onClick={otpDisabled ? sendOTP : verifyOTP}>Sign In</button>
+        <button className={`${loading ? "bg-gray-400" : "bg-[#F472B6]"} text-white font-bold w-full p-2 rounded-lg mt-5`} disabled={loading} onClick={otpDisabled ? sendOTP : verifyOTP}>{loading ? "Please wait..." : (otpDisabled ? "Send OTP" : "Submit")}</button>
       </div>
     </main>
   )
