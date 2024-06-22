@@ -40,9 +40,8 @@ export default function Layout({ children }: { children: any }) {
 }
 
 function Header() {
-  const [user, setUser, roomName, setRoomName, canvasDataUrl] = useAuth((s: any) => [s.user, s.setUser, s.roomName, s.setRoomName, s.canvasDataUrl]);
+  const [user, roomName, setRoomName, setSave, saving] = useAuth((s: any) => [s.user, s.roomName, s.setRoomName, s.setSave, s.saving]);
   const pathname = usePathname();
-  const [saving, setSaving] = useState(false);
   return (
     <header className="flex justify-between items-center bg-[#CCC5E7] p-3 px-7 text-lg absolute w-full">
       <h1 className={`${reggaeOne.className} text-3xl text-black`}><Link href={"/"}>Canvas</Link></h1>
@@ -51,22 +50,7 @@ function Header() {
         <input className="text-black w-56 font-bold bg-transparent focus-visible:outline-none" value={roomName} onChange={e => setRoomName(e.target.value)} />
         <button
           className={`${saving ? "bg-gray-400" : "bg-green-600"} p-1 px-3 rounded-lg`} disabled={saving}
-          onClick={async () => {
-            setSaving(true);
-            const response = await ifetch("/api/canvas/save", {
-              method: 'POST',
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${localStorage.getItem("token")}`
-              },
-              body: JSON.stringify({ 
-                name: roomName,
-                dataUrl: canvasDataUrl,
-              })
-            })
-            if (response?.data?.user) setUser(response.data.user);
-            setSaving(false);
-          }}
+          onClick={() => setSave(true)}
         >{saving ? "Saving..." : "Save"}</button>
       </div>
       }

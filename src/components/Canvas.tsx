@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { HexColorPicker } from "react-colorful";
 import { socket } from "../socket";
 import { useAuth } from "@/app/store";
+import { ifetch } from "@/app/services/utils";
 
 export default function Canvas({ width, height, className }: { width: number, height: number, className?: string }) {
   const [selectedController, setSelectedController] = useState<"brush" | "eraser">("brush");
@@ -13,7 +14,7 @@ export default function Canvas({ width, height, className }: { width: number, he
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [color, setColor] = useState("#000000");
   const [isconnected, setIsConnected] = useState(false);
-  const [admin, roomId, setCanvasDataUrl] = useAuth((s: any) => [s.admin, s.roomId, s.setCanvasDataUrl]);
+  const [admin, roomId, roomName, setUser, save, setSave, setSaving] = useAuth((s: any) => [s.admin, s.roomId, s.roomName, s.setUser, s.save, s.setSave, s.setSaving]);
   let ctx = canvasRef.current?.getContext('2d');
 
   const getX = (x: number) => {
@@ -113,8 +114,6 @@ export default function Canvas({ width, height, className }: { width: number, he
 
     function mouseUpFunc(e: MouseEvent) {
       mouseDown = false;
-      if (canvasRef.current) setCanvasDataUrl(canvasRef.current.toDataURL("image/png"));
-      // send();
     }
 
     function mouseMoveFunc(e: MouseEvent) {
@@ -133,7 +132,6 @@ export default function Canvas({ width, height, className }: { width: number, he
           sendErase(getX(e.clientX - canvas!.getBoundingClientRect().left), getY(e.clientY - canvas!.getBoundingClientRect().top), color);
           break;
       }
-      // send();
     }
 
     function clickFunc(e: MouseEvent) {
@@ -150,7 +148,6 @@ export default function Canvas({ width, height, className }: { width: number, he
           sendErase(getX(e.clientX - canvas!.getBoundingClientRect().left), getY(e.clientY - canvas!.getBoundingClientRect().top), color);
           break;
       }
-      // send();
     }
 
     async function hideColorPicker(e: MouseEvent) {
@@ -202,6 +199,28 @@ export default function Canvas({ width, height, className }: { width: number, he
 
     ctx!.lineWidth = thickness;
   }, [thickness])
+
+  useEffect(() => {
+    if (!canvasRef.current) return;
+    if (!save) return;
+    setSaving(false);
+    (async () => {
+      setSaving(true);
+      const response = await ifetch("/api/canvas/save", {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${localStorage.getItem("token")}`
+        },
+        body: JSON.stringify({ 
+          name: roomName,
+          dataUrl: canvasRef.current!.toDataURL(),
+        })
+      })
+      if (response?.data?.user) setUser(response.data.user);
+      setSaving(false);
+    })();
+  }, [save]);
 
   useEffect(() => {
     setCursorOrigin(() => {
