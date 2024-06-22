@@ -15,9 +15,7 @@ interface UserObject {
 export async function POST(req: NextRequest) {
   try {
     const user = await authenticateUser(req) as UserObject;
-    // const { name, dataUrl } = await req.json();
-    const name = "harsh";
-    const dataUrl = "Hetera";
+    const { name, dataUrl } = await req.json();
     if (!name || !dataUrl) {
       return NextResponse.json({
         success: false,
