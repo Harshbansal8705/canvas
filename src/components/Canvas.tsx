@@ -42,8 +42,8 @@ export default function Canvas({ width, height, className }: { width: number, he
       switch (type) {
         case "lineTo":
           ctx!.lineWidth = args[3];
-          ctx!.lineTo(args[0], args[1]);
           ctx!.strokeStyle = args[2];
+          ctx!.lineTo(args[0], args[1]);
           ctx!.stroke();
           break;
         case "moveTo":
@@ -123,6 +123,8 @@ export default function Canvas({ width, height, className }: { width: number, he
       drag = true;
       switch (selectedController) {
         case "brush":
+          ctx!.strokeStyle = color;
+          ctx!.lineWidth = thickness;
           ctx!.lineTo(getX(e.clientX - canvas!.getBoundingClientRect().left), getY(e.clientY - canvas!.getBoundingClientRect().top));
           ctx!.stroke();
           sendLineTo(getX(e.clientX - canvas!.getBoundingClientRect().left), getY(e.clientY - canvas!.getBoundingClientRect().top), thickness, color);
@@ -138,6 +140,8 @@ export default function Canvas({ width, height, className }: { width: number, he
       if (drag) return;
       switch (selectedController) {
         case "brush":
+          ctx!.lineWidth = thickness;
+          ctx!.fillStyle = color;
           ctx!.arc(getX(e.clientX - canvas!.getBoundingClientRect().left), getY(e.clientY - canvas!.getBoundingClientRect().top), thickness, 0, Math.PI * 2);
           ctx!.fillStyle = color;
           ctx!.fill();
