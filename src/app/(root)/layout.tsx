@@ -55,14 +55,17 @@ function Header() {
           >{saving ? "Saving..." : "Save"}</button>
         </div>
       }
-      {/* <button className="p-2 px-5 bg-[#763CF0] rounded-md font-semibold"><Link href={user ? "" : "/login"}>{user ? (user.name || user.email?.split("@")[0]) : "Sign In"}</Link></button> */}
-      <div className="flex gap-1 hover:bg-[#9893d357] active:opacity-80  p-2 rounded-lg cursor-default" onClick={() => setShowPopup(true)}>
-        <div className="text-left flex flex-col text-black justify-evenly">
-          <h2 className="leading-none text-xl font-medium">{user.name || user.email?.split("@")[0]}</h2>
-          <p className="leading-none text-sm">{user.email}</p>
+      {user ?
+        <div className="flex gap-1 hover:bg-[#9893d357] active:opacity-80  p-2 rounded-lg cursor-default" onClick={() => setShowPopup(true)}>
+          <div className="text-left flex flex-col text-black justify-evenly">
+            <h2 className="leading-none text-xl font-medium">{user.name || user.email?.split("@")[0]}</h2>
+            <p className="leading-none text-sm">{user.email}</p>
+          </div>
+          <img src="/user.svg" alt="" className="h-12 rounded-full bg-gray-400 p-2" />
         </div>
-        <img src="/user.svg" alt="" className="h-12 rounded-full bg-gray-400 p-2" />
-      </div>
+        :
+        <button className="p-2 px-5 bg-[#763CF0] rounded-md font-semibold"><Link href={user ? "" : "/login"}>{user ? (user.name || user.email?.split("@")[0]) : "Sign In"}</Link></button>
+      }
       {showPopup && <Popup user={user} setUser={setUser} setShowPopup={setShowPopup} />}
     </header>
   )
