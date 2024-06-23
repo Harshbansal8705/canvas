@@ -1,16 +1,7 @@
 import { prisma } from "@/app/services/db";
 import { authenticateUser } from "@/app/services/server/utils";
-import { handleServerError } from "@/app/services/utils";
+import { handleServerError, UserObject } from "@/app/services/utils";
 import { NextRequest, NextResponse } from "next/server";
-
-interface UserObject {
-  id: string;
-  email: string;
-  name?: string | null;
-  canvases: any[];
-  createdAt: Date;
-  updatedAt: Date;
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -59,6 +50,6 @@ export async function POST(req: NextRequest) {
       }
     }, { status: 201 })
   } catch (e: any) {
-    handleServerError(e);
+    return handleServerError(e);
   }
 }

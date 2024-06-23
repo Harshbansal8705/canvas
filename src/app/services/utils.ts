@@ -12,6 +12,15 @@ export async function ifetch(url: string, options: RequestInit) {
   return data;
 }
 
+export interface UserObject {
+  id: string;
+  email: string;
+  name?: string | null;
+  canvases: any[];
+  createdAt: Date;
+  updatedAt: Date;
+};
+
 export class CanvasError extends Error {
   statusCode: number;
 
