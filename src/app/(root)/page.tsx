@@ -37,9 +37,23 @@ export default function HomePage() {
 
       <div className="w-fit sm:pr-8 m-auto flex sm:block items-center flex-col">
         <h3 className="text-3xl m-4 mt-4 text-[#E0FFFF] self-start">Your Recent Drawings:</h3>
-        <div className="p-4 sm:px-8 m-4 grid sm:grid-cols-3 grid-cols-2 gap-8 sm:gap-10 lg:gap-14 w-fit">
-          {user && user.canvases?.map((canvas: any, id: number) => <CanvasCard key={id} canvas={canvas} />)}
-        </div>
+        {user ?
+          (user.canvases?.length > 0 ?
+            <div className="p-4 sm:px-8 m-4 grid sm:grid-cols-3 grid-cols-2 gap-8 sm:gap-10 lg:gap-14 w-fit">
+              {user && user.canvases?.map((canvas: any, id: number) => <CanvasCard key={id} canvas={canvas} />)}
+            </div>
+            :
+            <div className="p-4 sm:px-8 m-4">
+              <img src="/no-canvas-found.png" alt="" className="w-[60%]" />
+              <p className="text-gray-300 text-sm">No Saved canvases found</p>
+            </div>
+          )
+          :
+          <div className="p-4 sm:px-8 m-4">
+            <img src="/no-canvas-found.png" alt="" className="w-[60%]" />
+            <p className="text-gray-300 text-sm">Please Sign in to create and save canvases</p>
+          </div>
+        }
       </div>
     </div>
   );
