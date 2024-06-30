@@ -72,12 +72,12 @@ export default function CanvasPage() {
   if (!connected) return <PreLoader />
 
   return (
-    <div className="flex gap-4 h-[88vh]">
+    <div className="flex gap-4 h-full flex-col md:flex-row">
       <div className="w-full h-full flex items-center">
         <Canvas width={WIDTH} height={HEIGHT} className="w-full" />
       </div>
-      <div className="mx-auto flex flex-col items-center w-56 justify-between">
-        <div className="relative overflow-y-scroll">
+      <div className="mx-auto flex flex-col items-center md:w-56 justify-between w-full">
+        <div className="relative md:overflow-y-scroll md:overflow-x-hidden flex md:block items-start justify-start overflow-x-scroll w-full">
           {users && users.map((user, id) => <UserTile key={id} name={user.name || user.email?.split("@")[0]} />)}
         </div>
         <div className="flex h-16 items-end w-44 gap-2">

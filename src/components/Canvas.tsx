@@ -217,7 +217,7 @@ export default function Canvas({ width, height, className }: { width: number, he
           "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("token")}`
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           name: roomName,
           dataUrl: canvasRef.current!.toDataURL(),
         })
@@ -240,23 +240,25 @@ export default function Canvas({ width, height, className }: { width: number, he
 
   return (
     <div className={className + " flex flex-col gap-1 justify-center h-[inherit]"}>
-      <div className="flex gap-1">
-        <img src="/brush.png" alt="" className={`w-8 p-1 ${selectedController == "brush" && "bg-[#CECAFF42]"} rounded-md`} onClick={() => setSelectedController("brush")} />
-        <img src="/eraser.png" alt="" className={`w-8 p-1 ${selectedController == "eraser" && "bg-[#CECAFF42]"} rounded-md`} onClick={() => setSelectedController("eraser")} />
-        <div className={`w-8 p-1 rounded-md relative ${showThicknessSelector && "bg-[#CECAFF42]"}`} onMouseDown={(e: any) => e.stopPropagation()}>
-          <img src="/thickness-selector.png" alt="" onClick={() => setShowThicknessSelector(p => !p)} />
-          {showThicknessSelector && <div className="absolute p-2 px-3 bg-[#CECAFFCC] shadow  rounded-full mt-3">
-            <input type="range" min={1} max={100} value={thickness} onChange={(e: any) => setThicknesss(e.target?.value ?? 0)} />
-          </div>}
-        </div>
+      <div className="flex md:gap-1 flex-wrap">
+        <div className="hidden md:flex">
+          <img src="/brush.png" alt="" className={`w-8 p-1 ${selectedController == "brush" && "bg-[#CECAFF42]"} rounded-md`} onClick={() => setSelectedController("brush")} />
+          <img src="/eraser.png" alt="" className={`w-8 p-1 ${selectedController == "eraser" && "bg-[#CECAFF42]"} rounded-md`} onClick={() => setSelectedController("eraser")} />
+          <div className={`w-8 p-1 rounded-md relative ${showThicknessSelector && "bg-[#CECAFF42]"}`} onMouseDown={(e: any) => e.stopPropagation()}>
+            <img src="/thickness-selector.png" alt="" onClick={() => setShowThicknessSelector(p => !p)} />
+            {showThicknessSelector && <div className="absolute p-2 px-3 bg-[#CECAFFCC] shadow  rounded-full mt-3">
+              <input type="range" min={1} max={100} value={thickness} onChange={(e: any) => setThicknesss(e.target?.value ?? 0)} />
+            </div>}
+          </div>
         <div className={`w-8 p-1.5 rounded-md relative ${showColorPicker && "bg-[#CECAFF42]"}`} onMouseDown={(e: any) => e.stopPropagation()}>
           <div className={`w-full h-full`} style={{ backgroundColor: color }} onClick={() => setShowColorPicker(p => !p)}></div>
           {showColorPicker && <div className={`absolute mt-2 shadow-md`}>
             <HexColorPicker color={color} onChange={setColor} className="!cursor-crosshair" />
           </div>}
         </div>
+        </div>
         <p className={"px-2 py-1 font-bold " + (isconnected ? "text-green-500" : "text-red-500")}>{isconnected ? "Connected" : "Not connected"}</p>
-        <p className="px-2 py-1">Room ID: {roomId}</p>
+        <p className="px-2 py-1 whitespace-nowrap">Room ID: {roomId}</p>
       </div>
       <canvas ref={canvasRef} width={width} height={height} className={`bg-white w-full aspect-[2/1] cursor-brush`} style={{ cursor: `url('http://localhost:3000/${selectedController}.png') ${cursorOrigin.x} ${cursorOrigin.y}, auto` }}></canvas>
     </div>
