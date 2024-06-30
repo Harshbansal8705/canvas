@@ -32,7 +32,7 @@ export default function Layout({ children }: { children: any }) {
   return (
     <>
       <Header />
-      <main className="p-2 sm:p-2 md:p-4 min-h-[100vh] flex flex-col justify-center !pt-20">
+      <main className="p-2 sm:p-2 md:p-4 flex-1 overflow-hidden">
         {children}
       </main>
     </>
@@ -44,9 +44,9 @@ function Header() {
   const pathname = usePathname();
   const [showPopup, setShowPopup] = useState(false);
   return (
-    <header className="flex justify-between items-center bg-[#CCC5E7] p-3 px-7 text-lg absolute w-full">
-      <h1 className={`${reggaeOne.className} text-3xl text-black`}><Link href={"/"}>Canvas</Link></h1>
-      {pathname === "/canvas" &&
+    <header className="flex justify-between items-center bg-[#CCC5E7] px-2 md:px-5 text-lg w-full py-2 overflow-hidden">
+      <h1 className={`${reggaeOne.className} text-xl lg:text-3xl text-black`}><Link href={"/"}>Canvas</Link></h1>
+      {/* {pathname === "/canvas" &&
         <div>
           <input className="text-black w-56 font-bold bg-transparent focus-visible:outline-none" value={roomName} onChange={e => setRoomName(e.target.value)} />
           <button
@@ -54,17 +54,17 @@ function Header() {
             onClick={() => setSave(true)}
           >{saving ? "Saving..." : "Save"}</button>
         </div>
-      }
+      } */}
       {user ?
-        <div className="flex gap-1 hover:bg-[#9893d357] active:opacity-80  p-2 rounded-lg cursor-default" onClick={() => setShowPopup(true)}>
+        <div className="flex gap-1 hover:bg-[#9893d357] active:opacity-80 rounded-lg cursor-default" onClick={() => setShowPopup(true)}>
           <div className="text-left flex flex-col text-black justify-evenly">
-            <h2 className="leading-none text-xl font-medium">{user.name || user.email?.split("@")[0]}</h2>
+            <h2 className="leading-none text-md lg:text-xl font-medium">{user.name || user.email?.split("@")[0]}</h2>
             <p className="leading-none text-sm">{user.email}</p>
           </div>
-          <img src="/user.svg" alt="" className="h-12 rounded-full bg-gray-400 p-2" />
+          <img src="/user.svg" alt="" className="h-9 rounded-full bg-gray-400 p-2" />
         </div>
         :
-        <button className="p-2 px-5 bg-[#763CF0] rounded-md font-semibold"><Link href={user ? "" : "/login"}>{user ? (user.name || user.email?.split("@")[0]) : "Sign In"}</Link></button>
+        <button className="p-1.5 md:p-2 px-2 md:px-4 lg:px-5 bg-[#763CF0] rounded-md font-semibold text-sm md:text-md lg:text-xl"><Link href={user ? "" : "/login"}>{user ? (user.name || user.email?.split("@")[0]) : "Sign In"}</Link></button>
       }
       {showPopup && <Popup user={user} setUser={setUser} setShowPopup={setShowPopup} />}
     </header>
