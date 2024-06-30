@@ -14,7 +14,7 @@ export async function middleware(req: NextRequest) {
     }, { status: 400 });
     let user;
     try {
-      user = (await jose.jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "")) as any).user;
+      user = (await jose.jwtVerify(token, new TextEncoder().encode(process.env.JWT_SECRET || "")) as any).payload;
     } catch (e) {
       return NextResponse.json({ success: false, error: "Invalid token" }, { status: 400 });
     }
