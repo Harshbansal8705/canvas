@@ -60,11 +60,15 @@ export async function sendOtp(to: string, otp: string) {
     text: `Your OTP for login to Canvas is ${otp}. This OTP is valid for 5 minutes.`
   };
   
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
-  });
+  const promise = new Promise((resolve, reject) => {
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        reject(error);
+      } else {
+        resolve(info.response);
+      }
+    });
+  })
+
+  return await promise;
 }
