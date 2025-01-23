@@ -5,9 +5,8 @@ import { prisma } from "../db";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 465,
-  secure: true,
+  host: 'smtp.sendgrid.net',
+  port: 587,
   auth: {
     user: process.env.NODEMAILER_USERNAME,
     pass: process.env.NODEMAILER_PASSWORD
@@ -54,7 +53,7 @@ export async function authenticateUser(req: NextRequest) {
 
 export async function sendOtp(to: string, otp: string) {
   const mailOptions = {
-    from: `Canvas <${process.env.NODEMAILER_USERNAME}>`,
+    from: `Canvas <canvas@harshbansal.in>`,
     to,
     subject: 'OTP for Login to Canvas',
     text: `Your OTP for login to Canvas is ${otp}. This OTP is valid for 5 minutes.`
