@@ -2,7 +2,7 @@ import { NextApiRequest } from "next";
 import { randomInt } from "crypto";
 import { NextResponse } from "next/server";
 import { prisma } from "@/app/services/db";
-import { handleServerError } from "@/app/services/utils";
+import { CanvasError, handleServerError } from "@/app/services/utils";
 import { sendOtp } from "@/app/services/server/utils";
 
 export async function POST(req: Request) {
@@ -22,7 +22,12 @@ export async function POST(req: Request) {
   
     const otp = randomInt(100000, 999999).toString();
   
-    const otpSent = await sendOtp(email, otp);
+    try {
+      await sendOtp(email, otp);
+    } catch (error: any) {
+      console.log(error);
+      throw new CanvasError("OTPError", 500, "Error sending OTP");
+    }
 
     let otpObject = await prisma.otp.findUnique({
       where: {
