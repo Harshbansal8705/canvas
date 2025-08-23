@@ -5,8 +5,8 @@ import { prisma } from "../db";
 import nodemailer from "nodemailer";
 
 const transporter = nodemailer.createTransport({
-  host: 'smtp.sendgrid.net',
-  port: 587,
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT || "587"),
   auth: {
     user: process.env.NODEMAILER_USERNAME,
     pass: process.env.NODEMAILER_PASSWORD
@@ -18,10 +18,10 @@ export async function authenticateUser(req: NextRequest) {
   if (!userHeader) {
     return NextResponse.json({
       success: false,
-      error: "Not Authenthicated",
+      error: "Not Authenticated",
       toast: {
         type: "error",
-        message: "Not Authenthicated",
+        message: "Not Authenticated",
       }
     }, { status: 400 })
   }
