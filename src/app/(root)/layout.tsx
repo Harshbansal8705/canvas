@@ -46,7 +46,7 @@ function Header() {
   return (
     <header className="flex justify-between items-center bg-[#CCC5E7] px-2 md:px-5 text-lg w-full py-2 overflow-hidden">
       <h1 className={`${reggaeOne.className} text-xl lg:text-3xl text-black`}><Link href={"/"}>Canvas</Link></h1>
-      {/* {pathname === "/canvas" &&
+      {pathname === "/canvas" &&
         <div>
           <input className="text-black w-56 font-bold bg-transparent focus-visible:outline-none" value={roomName} onChange={e => setRoomName(e.target.value)} />
           <button
@@ -54,7 +54,7 @@ function Header() {
             onClick={() => setSave(true)}
           >{saving ? "Saving..." : "Save"}</button>
         </div>
-      } */}
+      }
       {user ?
         <div className="flex gap-1 hover:bg-[#9893d357] active:opacity-80 rounded-lg cursor-default" onClick={() => setShowPopup(true)}>
           <div className="text-left flex flex-col text-black justify-evenly">
