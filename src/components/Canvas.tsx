@@ -4,6 +4,7 @@ import { HexColorPicker } from "react-colorful";
 import { socket } from "../socket";
 import { useAuth } from "@/app/store";
 import { ifetch } from "@/app/services/utils";
+import Cursor from "./Cursor";
 
 export default function Canvas({ width, height, className }: { width: number, height: number, className?: string }) {
   const [selectedController, setSelectedController] = useState<"brush" | "eraser">("brush");
@@ -12,9 +13,13 @@ export default function Canvas({ width, height, className }: { width: number, he
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [showThicknessSelector, setShowThicknessSelector] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
   const [color, setColor] = useState("#000000");
   const [isconnected, setIsConnected] = useState(false);
-  const [admin, roomId, roomName, setUser, save, setSave, setSaving] = useAuth((s: any) => [s.admin, s.roomId, s.roomName, s.setUser, s.save, s.setSave, s.setSaving]);
+  const lastCursorEmit = useRef<number>(0);
+  const [admin, roomId, roomName, setUser, save, setSave, setSaving, user, userCursors, setUserCursor, removeUserCursor] = useAuth((s) => [
+    s.admin, s.roomId, s.roomName, s.setUser, s.save, s.setSave, s.setSaving, s.user, s.userCursors, s.setUserCursor, s.removeUserCursor
+  ]);
   let ctx = canvasRef.current?.getContext('2d');
 
   const getX = (x: number) => {
@@ -76,12 +81,43 @@ export default function Canvas({ width, height, className }: { width: number, he
       img.src = dataUrl;
     })
 
+    socket.on("cursor-move", (data: { userId: string, userName: string, x: number, y: number }) => {
+      if (data.userId !== user?.id) {
+        const canvasRect = canvasRef.current?.getBoundingClientRect();
+        if (canvasRect) {
+          const canvasX = data.x * canvasRect.width;
+          const canvasY = data.y * canvasRect.height;
+          console.log(data.userId, canvasX, canvasY)
+          setUserCursor(data.userId, {
+            x: canvasX,
+            y: canvasY,
+            userId: data.userId,
+            userName: data.userName,
+          });
+        }
+      }
+    });
+
+    socket.on("cursor-leave", (data: { userId: string }) => {
+      removeUserCursor(data.userId);
+    });
+
+    socket.on("user-disconnected", (data: { userId: string }) => {
+      removeUserCursor(data.userId);
+    });
+
     socket.on("connect", onConnect);
     socket.on("disconnect", onDisconnect);
 
     return () => {
       socket.off("connect", onConnect);
       socket.off("disconnect", onDisconnect);
+      socket.off("draw");
+      socket.off("get-canvas-data");
+      socket.off("canvas-data");
+      socket.off("cursor-move");
+      socket.off("cursor-leave");
+      socket.off("user-disconnected");
     };
   }, []);
 
@@ -117,6 +153,29 @@ export default function Canvas({ width, height, className }: { width: number, he
     }
 
     function mouseMoveFunc(e: MouseEvent) {
+      const now = Date.now();
+      const shouldEmitCursor = now - lastCursorEmit.current > 33; // ~30fps
+      
+      if (shouldEmitCursor) {
+        const canvasRect = canvas!.getBoundingClientRect();
+        const screenX = e.clientX - canvasRect.left;
+        const screenY = e.clientY - canvasRect.top;
+        
+        if (user && screenX >= 0 && screenY >= 0 && screenX <= canvasRect.width && screenY <= canvasRect.height) {
+          const relativeX = screenX / canvasRect.width;
+          const relativeY = screenY / canvasRect.height;
+          
+          socket.emit("cursor-move", {
+            userId: user.id,
+            userName: user.name || user.email?.split("@")[0] || "Anonymous",
+            x: relativeX,
+            y: relativeY,
+          });
+          console.log(`Cursor moved: ${user.name || user.email?.split("@")[0] || "Anonymous"} at relative (${relativeX.toFixed(3)}, ${relativeY.toFixed(3)})`);
+          lastCursorEmit.current = now;
+        }
+      }
+
       if (!mouseDown) {
         return;
       }
@@ -159,10 +218,19 @@ export default function Canvas({ width, height, className }: { width: number, he
       setShowThicknessSelector(false);
     }
 
+    function mouseLeaveFunc(e: MouseEvent) {
+      if (user) {
+        socket.emit("cursor-leave", {
+          userId: user.id,
+        });
+      }
+    }
+
     canvas!.addEventListener("mousedown", mouseDownFunc)
     canvas!.addEventListener("mouseup", mouseUpFunc)
     canvas!.addEventListener("mousemove", mouseMoveFunc);
     canvas!.addEventListener("click", clickFunc);
+    canvas!.addEventListener("mouseleave", mouseLeaveFunc);
     window.addEventListener("mousedown", hideColorPicker);
 
     return () => {
@@ -170,6 +238,7 @@ export default function Canvas({ width, height, className }: { width: number, he
       canvas!.removeEventListener("mouseup", mouseUpFunc)
       canvas!.removeEventListener("mousemove", mouseMoveFunc);
       canvas!.removeEventListener("click", clickFunc);
+      canvas!.removeEventListener("mouseleave", mouseLeaveFunc);
       window.removeEventListener("mousedown", hideColorPicker);
     }
   }, [canvasRef, selectedController, color, thickness])
@@ -246,13 +315,13 @@ export default function Canvas({ width, height, className }: { width: number, he
           <img src="/eraser.png" alt="" className={`w-8 p-1 ${selectedController == "eraser" && "bg-[#CECAFF42]"} rounded-md`} onClick={() => setSelectedController("eraser")} />
           <div className={`w-8 p-1 rounded-md relative ${showThicknessSelector && "bg-[#CECAFF42]"}`} onMouseDown={(e: any) => e.stopPropagation()}>
             <img src="/thickness-selector.png" alt="" onClick={() => setShowThicknessSelector(p => !p)} />
-            {showThicknessSelector && <div className="absolute p-2 px-3 bg-[#CECAFFCC] shadow  rounded-full mt-3">
+            {showThicknessSelector && <div className="absolute p-2 px-3 bg-[#CECAFFCC] shadow rounded-full mt-3 z-50">
               <input type="range" min={1} max={100} value={thickness} onChange={(e: any) => setThicknesss(e.target?.value ?? 0)} />
             </div>}
           </div>
         <div className={`w-8 p-1.5 rounded-md relative ${showColorPicker && "bg-[#CECAFF42]"}`} onMouseDown={(e: any) => e.stopPropagation()}>
           <div className={`w-full h-full`} style={{ backgroundColor: color }} onClick={() => setShowColorPicker(p => !p)}></div>
-          {showColorPicker && <div className={`absolute mt-2 shadow-md`}>
+          {showColorPicker && <div className={`absolute mt-2 shadow-md z-50`}>
             <HexColorPicker color={color} onChange={setColor} className="!cursor-crosshair" />
           </div>}
         </div>
@@ -260,7 +329,21 @@ export default function Canvas({ width, height, className }: { width: number, he
         <p className={"px-2 py-1 font-bold " + (isconnected ? "text-green-500" : "text-red-500")}>{isconnected ? "Connected" : "Not connected"}</p>
         <p className="px-2 py-1 whitespace-nowrap">Room ID: {roomId}</p>
       </div>
-      <canvas ref={canvasRef} width={width} height={height} className={`bg-white w-full aspect-[2/1] cursor-brush`} style={{ cursor: `url('http://localhost:3000/${selectedController}.png') ${cursorOrigin.x} ${cursorOrigin.y}, auto` }}></canvas>
+      <div className="relative w-full" ref={containerRef}>
+        <canvas ref={canvasRef} width={width} height={height} className={`bg-white w-full aspect-[2/1] cursor-brush`} style={{ cursor: `url('http://localhost:3000/${selectedController}.png') ${cursorOrigin.x} ${cursorOrigin.y}, auto` }}></canvas>
+        
+        {Array.from(userCursors.values()).map((cursor) => {
+          return (
+            <Cursor
+              key={cursor.userId}
+              x={cursor.x}
+              y={cursor.y}
+              userName={cursor.userName}
+              color={`hsl(${cursor.userId.charCodeAt(0) * 137.5 % 360}, 70%, 50%)`}
+            />
+          );
+        })}
+      </div>
     </div>
   );
 }
